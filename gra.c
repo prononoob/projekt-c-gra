@@ -2,10 +2,16 @@
 #include <stdio.h>
 #include <string.h>
 
+// gra ma 3 zakonczenia, mozesz umrzec w walce, pokonac wszystkie smoki, zostac oszukanym przez ostatniego smoka
+
+// ilosci itemkow
 int potkaOdwagi = 0;
 int potkaZdrowia = 0;
+
 int zdrowieGracza = 10;
 int atakGracza = 2;
+
+// tablica w ktorej trzymam wartosci 0 i 1, sluzy do tego zeby nie dalo sie wrocic do obronionej lokacji
 int pokonaneLokacje[3] = {0,0,0};
 
 // Funkcja do wyczyszczenia bufora wejsciowego
@@ -14,16 +20,18 @@ void clear_input_buffer() {
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
+// Funkcja ktora wywoluje w kazdej dzielnicy zeby walczyc ze smokiem
 void walkaZeSmokiem(int zdrowieSmoka, int idDzielnicy) {
     atakGracza = 2;
     char input;
     int valid = 0;
-    int smokeZdrowie = zdrowieSmoka;
+    int smoczeZdrowie = zdrowieSmoka;
 
     int atakSmoka = 0;
-    while (smokeZdrowie > 0 && zdrowieGracza > 0) {
-        printf("\nTwoj atak: %d\nTwoje zdrowie: %d\nZdrowie smoka: %d", atakGracza, zdrowieGracza, smokeZdrowie);
+    while (smoczeZdrowie > 0 && zdrowieGracza > 0) {
+        printf("\nTwoj atak: %d\nTwoje zdrowie: %d\nZdrowie smoka: %d", atakGracza, zdrowieGracza, smoczeZdrowie);
         printf("\nItemy:");
+        // Sprawdzam i wyswietlam jakie itemy ma uzytkownik
         if (potkaOdwagi == 0 && potkaZdrowia == 0) {
             printf("Nie masz zadnych itemow");
         }
@@ -35,14 +43,16 @@ void walkaZeSmokiem(int zdrowieSmoka, int idDzielnicy) {
         }
         printf("\nCo robisz?\n\t1 - atak\n\t2 - itemy\n");
         input = getchar();
-        clear_input_buffer();
-
+        clear_input_buffer(); // czyszczenie buffera przy blednych wejsciach uzytkownika
+        // zmniejszam smocze zdrowie o punkty ataku gracza
         if (input == '1') {
-            smokeZdrowie -= atakGracza;
-            printf("\n\nZadajesz %d obrazen! Zdrowie Smoka: %d\n", atakGracza, smokeZdrowie);
-            if (smokeZdrowie > 0) {
+            smoczeZdrowie -= atakGracza;
+            printf("\n\nZadajesz %d obrazen! Zdrowie Smoka: %d\n", atakGracza, smoczeZdrowie);
+            // sprawdzam czy smok moze atakowac czy zginal
+            if (smoczeZdrowie > 0) {
                 printf("Smok kontratakuje!\n");
-                if (smokeZdrowie > 0) {
+                if (smoczeZdrowie > 0) {
+                    // smok losowo bije za 1 albo 2 puntky ataku
                     atakSmoka = rand() % 2 + 1;
                     zdrowieGracza -= atakSmoka;
                     printf("Smok kontratakuje i zadaje %d obrazen! Twoje zdrowie: %d\n", atakSmoka, zdrowieGracza);
@@ -54,8 +64,9 @@ void walkaZeSmokiem(int zdrowieSmoka, int idDzielnicy) {
                 return;
             }
         }
+        // wybor itemkow, potki zdrowia i potki odwagi
         else if (input == '2') {
-            if (potkaOdwagi > 0 || potkaZdrowia > 0) {
+            if (potkaOdwagi > 0 || potkaZdrowia > 0) { // jesli gracz ma jakiekolwiek itemy
                 printf("\nUzywanie mikstur...\n");
                 char itemInput;
                 int itemValid = 0;
@@ -67,6 +78,7 @@ void walkaZeSmokiem(int zdrowieSmoka, int idDzielnicy) {
 
                     switch (itemInput) {
                     case '1':
+                        // potka odwagi dodaje +2 do ataku w tym starciu
                         if (potkaOdwagi > 0) {
                             potkaOdwagi--;
                             atakGracza += 2;
@@ -78,6 +90,7 @@ void walkaZeSmokiem(int zdrowieSmoka, int idDzielnicy) {
                         }
                         break;
                     case '2':
+                        // potka zdrowia dodaje leczy gracza o +5
                         if (potkaZdrowia > 0) {
                             potkaZdrowia--;
                             zdrowieGracza += 5;
@@ -98,14 +111,14 @@ void walkaZeSmokiem(int zdrowieSmoka, int idDzielnicy) {
             }
         }
         else if (input == '2' && (potkaOdwagi == 0 && potkaZdrowia == 0)) {
-            printf("\nNie masz zadnych itemowna sesje...\n");
+            printf("\nNie masz zadnych itemow...\n");
         }
         else {
             printf("Nieprawidlowe wejscie. Sprobuj ponownie.\n");
         }
     }
-
-    if (smokeZdrowie <= 0) {
+    // sprawdzam kto umarl
+    if (smoczeZdrowie <= 0) {
         printf("\nPokonales Smoka! Gratulacje!\n");
         pokonaneLokacje[idDzielnicy] = 1;
     }
@@ -124,7 +137,7 @@ void zawodzie() {
     printf("\nNa twojej drodze staje grupka dzentelmenow ubranych w dresy\nDecydujesz sie ich ominac czy wdac w dyskusje?");
 
     while (!valid) {
-        printf("Podaj wartosc (1, 2): ");
+        printf("Podaj wartosc (1 - omijam, 2 - dyskutuje): ");
         input = getchar();
         clear_input_buffer();
 
@@ -146,8 +159,8 @@ void zawodzie() {
     printf("\nNajwyzsza pora zmierzyc sie ze Smokiem Gyeksiarskim\n");
     valid = 0;
     // Walka ze Smokiem Gyeksiarskim
-    int smokeZdrowie = 10;
-    printf("\nWalczysz ze Smokiem Gyeksiarskim! Smok ma %d zdrowia.\n", smokeZdrowie);
+    int smoczeZdrowie = 10;
+    printf("\nWalczysz ze Smokiem Gyeksiarskim! Smok ma %d zdrowia.\n", smoczeZdrowie);
 
     walkaZeSmokiem(10, 0);
 }
@@ -161,7 +174,7 @@ void szopienice() {
     printf("\nSpotykasz grupke skautow, ktorzy oferuja ci Miksture Zdrowia.\nDecydujesz sie przyjac ich pomoc?");
 
     while (!valid) {
-        printf("Podaj wartosc (1, 2): ");
+        printf("Podaj wartosc (1 - tak, 2 - nie): ");
         input = getchar();
         clear_input_buffer();
 
@@ -195,7 +208,7 @@ void giszowiec() {
     printf("\nSpotykasz ogrodnika, ktory proponuje ci Miksture Odwagi w zamian za pomoc w ugaszeniu pozaru na jego dzialce.\nDecydujesz sie mu pomoc?");
 
     while (!valid) {
-        printf("Podaj wartosc (1, 2): ");
+        printf("Podaj wartosc (1 - tak, 2 - nie): ");
         input = getchar();
         clear_input_buffer();
 
@@ -252,6 +265,7 @@ int main() {
     char input;
     valid = 0;
     // glowny game loop obrony 3 dzielnic
+    // warunek w while sprawdza czy ktoras lokacja zostala jeszcze do obronienia, jesli wszystkie juz sa obronione to sie konczy
     while (!pokonaneLokacje[0] || !pokonaneLokacje[1] || !pokonaneLokacje[2]) {
         printf("\n\nAktualnie w miescie Pyroklas smoki atakuja trzy dzielnice:\n\n\t* Zawodzie\n\n\t* Szopienice\n\n\t* Giszowiec\n\n");
         printf("\n\nGdzie chcesz sie udac %s? Wpisz 1, 2 lub 3 aby przejsc do wyboru dzielnicy\n", nazwaGracza);
@@ -261,6 +275,7 @@ int main() {
             clear_input_buffer(); // wyczysc bufor po kazdym odczycie
 
             switch (input) {
+            // sprawdzam czy lokacja jest obroniona, do obronionej lokacji nie mozna ponownie wejsc
             case '1':
                 if (!pokonaneLokacje[0]) {
                     zawodzie();
@@ -294,6 +309,7 @@ int main() {
         }
         valid = 0;
     }
+    // jesli wszystkie trzy dzielnice zostaly juz obronione to wykonuje sie ponizszy kod
     valid = 0;
     printf("Ostatni smok, chwile przed tym jak skonal, wydusil z siebie ze wszyscy byly kontrolowani przez... Wladce Zaru!\n\nPora na finalne starcie...\n\n");
     printf("Przed walka masz chwile zeby isc do kaplicy i poprosic strazackie bostwo o regeneracje ran poniesionych w walkach\n\n");
@@ -306,7 +322,7 @@ int main() {
 
         switch (input) {
         case '1':
-            bonusZdrowia = rand() % 10 + 9;
+            bonusZdrowia = rand() % 10 + 9; // losowy wzrost zdrowia od 9 do 18
             zdrowieGracza += bonusZdrowia;
             printf("Twoje zdrowie wzroslo o %d i wynosi %d\n\n", bonusZdrowia, zdrowieGracza);
             valid = 1;
@@ -329,6 +345,7 @@ int main() {
 
         switch (input) {
         case '1':
+            // ZLE ZAKONCZENIE
             printf("\n - - - - - - - - - -\nPORAZKA\n- - - - - - - - - - \nIdziesz na uklad ze smokiem, jednak jego obietnica okazala sie okropnym klamstwem\n\nWladca Zaru wyciaga do ciebie lape, ale zanim zdazysz sie zorientowac lezysz zmiazdzony pod jej ciezarem\n\n");
             printf("Dales sie oszukac %s...", nazwaGracza);
             return 0;
@@ -342,6 +359,7 @@ int main() {
     }
     printf("Walczysz z Wladca Zaru!");
     walkaZeSmokiem(15, 0);
+    // DOBRE ZAKONCZENIE
     if (zdrowieGracza>0) {
         printf(" **GRATULACJE!** \n");
         printf(" Udalo ci sie obronic miasto Pyroklas przed wszystkimi smokami, w tym przed Wladca Zaru!\n");
